@@ -21,6 +21,8 @@ exports.getAllFromMR = (_req, res) => {
     "quantity",
     "isAvailable",
     "managedBy",
+    "imgCaption",
+    "imgURLs",
   ])
     .populate("managedBy", ["_id", "name"].join(" "))
     .exec((err, items) => {
@@ -45,6 +47,8 @@ exports.getAllFromSpecificMR = (req, res) => {
     "quantity",
     "isAvailable",
     "managedBy",
+    "imgCaption",
+    "imgURLs",
   ])
     .populate("managedBy", ["_id", "name"].join(" "))
     .exec((err, items) => {
@@ -69,14 +73,16 @@ exports.getItemFromMR = (req, res) => {
     "quantity",
     "isAvailable",
     "managedBy",
+    "imgCaption",
+    "imgURLs",
   ])
     .populate("managedBy", ["_id", "name"].join(" "))
-    .exec((err, items) => {
+    .exec((err, item) => {
       if (err) {
         return res.status(400).send({ error: err });
       }
 
-      res.send(items);
+      res.send(item);
     });
 };
 

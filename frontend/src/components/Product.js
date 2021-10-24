@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useStateValue } from "../StateProvider";
 import { server } from "../utils";
-// import ImageGallery from "react-image-gallery";
+import ImageGallery from "react-image-gallery";
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -12,7 +12,7 @@ const Product = ({ isMR }) => {
   const { id } = useParams();
   const [{ cart, user }, dispatch] = useStateValue();
   const [
-    { name, description, type, company, price, quantity = 0 },
+    { name, description, type, company, price, quantity = 0, imgURLs = null },
     setProduct,
   ] = useState({
     name: null,
@@ -21,11 +21,19 @@ const Product = ({ isMR }) => {
     company: null,
     price: null,
   });
+  const [images, setImages] = useState(null);
   useEffect(() => {
     server
       .get(isMR ? `/stock/mr/item/${id}` : `/stock/pharmacy/item/${id}`)
       .then(({ data }) => {
         setProduct(data);
+        const tmpImages = data.imgURLs.map((imgURL) => {
+          return {
+            original: imgURL,
+            thumbnail: imgURL,
+          };
+        });
+        setImages(tmpImages);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -47,12 +55,16 @@ const Product = ({ isMR }) => {
   return (
     <Container style={{ marginTop: "2vh" }}>
       <Typography variant="h4">{name}</Typography>
-      {/* <ImageGallery
-        autoPlay
-        showPlayButton={false}
-        className="image"
-        items={images}
-      /> */}
+      {images && (
+        <ImageGallery
+          // originalHeight={"10vh"}
+          // thumbnailHeight={10}
+          style={{ height: "10vh" }}
+          autoPlay
+          showPlayButton={false}
+          items={images}
+        />
+      )}
       <br />
       <Typography variant="h5">Price: ₹{price} </Typography>
       {isMR && (

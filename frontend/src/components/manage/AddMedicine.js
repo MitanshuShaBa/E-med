@@ -9,28 +9,53 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink, useHistory } from "react-router-dom";
+import { storage } from "../../firebase";
 import { useStateValue } from "../../StateProvider";
 import { server } from "../../utils";
+import { getDownloadURL, ref, uploadBytes } from "@firebase/storage";
 
 const AddMedicine = () => {
   const [{ user }] = useStateValue();
   const history = useHistory();
   const [item, setItem] = useState(null);
+  const [images, setImages] = useState(null);
   const isMR = user.role === "mr";
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    server
-      .post(`/stock/${isMR ? "mr" : "pharmacy"}/add`, {
-        ...item,
-        isAvailable: true,
-        isMR,
-        managedBy: user._id,
+    const _id = "6164456a5aa2b1b31f197a92";
+    console.log(item);
+    console.log(images);
+
+    Promise.all(
+      [...images].map((image) =>
+        uploadBytes(
+          ref(storage, `${Date.now()}.${image?.type?.split("/")[1]}`),
+          image
+        )
+      )
+    )
+      .then((snapshots) => {
+        Promise.all(
+          snapshots.map((snapshot) => getDownloadURL(snapshot.ref))
+        ).then((imgURLs) => {
+          const imgCaption = imgURLs[0];
+          server
+            .post(`/stock/${isMR ? "mr" : "pharmacy"}/add`, {
+              ...item,
+              isAvailable: true,
+              isMR,
+              managedBy: user._id,
+              imgURLs,
+              imgCaption,
+            })
+            .then(({ data }) => {
+              console.log(data);
+              history.push("/manage/medicines");
+            });
+        });
       })
-      .then(({ data }) => {
-        console.log(data);
-        history.push("/manage/medicines");
-      });
+      .catch((err) => console.log(err));
   };
 
   const handleChange = (e) => {
@@ -38,6 +63,10 @@ const AddMedicine = () => {
       ...prevState,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleChangeFiles = (e) => {
+    setImages(e.target.files);
   };
 
   const handleChangeNumber = (e) => {
@@ -137,6 +166,18 @@ const AddMedicine = () => {
           type="number"
           required
         />
+        <TextField
+          fullWidth
+          required
+          style={{ marginBottom: "2vh" }}
+          name="images"
+          type="file"
+          inputProps={{ accept: "image/png,image/jpeg", multiple: true }}
+          onChange={handleChangeFiles}
+          variant="outlined"
+          defaultValue=""
+        />
+        <br />
         <Button variant="contained" type="submit">
           Submit
         </Button>

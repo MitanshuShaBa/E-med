@@ -18,6 +18,7 @@ const Home = ({ isMR }) => {
     <Container style={{ marginTop: "4vh" }}>
       <Grid container spacing={2}>
         {medicines.map((medicine, index) => {
+          console.log(medicine);
           return (
             <Grid
               key={index}

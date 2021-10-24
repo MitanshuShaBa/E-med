@@ -1,7 +1,7 @@
 import { Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
-const Medicine = ({ _id, name, price, type, isMR }) => {
+const Medicine = ({ _id, name, price, type, isMR, imgCaption }) => {
   return (
     <Card style={{ marginBottom: "2vh", maxWidth: 345 }}>
       <CardActionArea
@@ -24,7 +24,7 @@ const Medicine = ({ _id, name, price, type, isMR }) => {
                 paddingLeft: "2vw",
                 width: "90%",
               }}
-              // TODO src={imgURL}
+              src={imgCaption}
               alt={name}
             />
           </div>

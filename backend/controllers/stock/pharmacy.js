@@ -23,6 +23,8 @@ exports.getAllFromPharmacy = (_req, res) => {
     "price",
     "quantity",
     "managedBy",
+    "imgCaption",
+    "imgURLs",
   ])
     .populate("managedBy", ["_id", "name"].join(" "))
     .exec((err, items) => {
@@ -49,6 +51,8 @@ exports.getAllFromSpecificPharmacy = (req, res) => {
     "quantity",
     "isAvailable",
     "managedBy",
+    "imgCaption",
+    "imgURLs",
   ])
     .populate("managedBy", ["_id", "name"].join(" "))
     .exec((err, items) => {
@@ -73,6 +77,8 @@ exports.getItemFromPharmacy = (req, res) => {
     "quantity",
     "isAvailable",
     "managedBy",
+    "imgCaption",
+    "imgURLs",
   ])
     .populate("managedBy", ["_id", "name"].join(" "))
     .exec((err, items) => {

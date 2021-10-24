@@ -15,12 +15,16 @@ const Cart = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [reRender, setReRender] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [{ cart }, dispatch] = useStateValue();
+  const [{ cart, user }, dispatch] = useStateValue();
 
   useEffect(() => {
     Promise.all(
       Object.keys(cart).map((stockID) => {
-        return server.get(`/stock/pharmacy/item/${stockID}`);
+        return server.get(
+          `/stock/${
+            user.role === "pharmacist" ? "mr" : "pharmacy"
+          }/item/${stockID}`
+        );
       })
     )
       .then((cartData) => {
@@ -49,8 +53,44 @@ const Cart = () => {
 
   const handleBuyCart = () => {
     setLoading(true);
-    // TODO
-    setLoading(false);
+    let sellers = [];
+    const tmpItems = medicines.map(
+      ({ _id, name, price, cost, cartQuantity, managedBy }) => {
+        sellers.push(managedBy._id);
+        return {
+          name,
+          price,
+          cost,
+          quantity: cartQuantity,
+          productID: _id,
+        };
+      }
+    );
+    const order = {
+      items: tmpItems,
+      address: user.address,
+      patient: user.role === "user" && user.name,
+      phoneNum: user.phoneNum,
+      buyer: user._id,
+      seller: sellers,
+      total: totalPrice,
+    };
+    console.log(order);
+
+    server
+      .post(
+        `/order/${user.role === "pharmacist" ? "mr" : "pharmacy"}/create`,
+        order
+      )
+      .then(() => {
+        dispatch({ type: "SET_CART", cart: {} });
+        setReRender(reRender + 1);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   };
 
   return (

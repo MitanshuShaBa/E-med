@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema(
     encry_password: {
       type: String,
       required: true,
-    },
+    }, // TODO add disabled field no access anymore
     salt: String,
   },
   {

@@ -53,7 +53,7 @@ const respondWithTokenAndUser = (res, user) => {
   const token = jwt.sign({ id: _id, email, scope: role }, process.env.SECRET);
 
   //Put token in cookie
-  res.cookie("token", token, { expire: new Date(Date.now() + 1) });
+  // res.cookie("token", token, { expire: new Date(Date.now() + 1) });
 
   //send response to front end
   res.json({
