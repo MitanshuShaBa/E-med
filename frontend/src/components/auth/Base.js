@@ -4,10 +4,11 @@ import {
   CardContent,
   CardHeader,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import { useStateValue } from "../../StateProvider";
 import { server } from "../../utils";
 
@@ -82,6 +83,16 @@ const Base = ({ isLogin }) => {
               onChange={handleChange}
               style={{ width: "100%", marginTop: "2vh" }}
             />
+            {isLogin && (
+              <Link to="/forgot-password">
+                <Typography
+                  style={{ width: "100%", marginTop: "2vh" }}
+                  variant="body2"
+                >
+                  Forgot Password?
+                </Typography>
+              </Link>
+            )}
             <div
               style={{
                 display: "flex",

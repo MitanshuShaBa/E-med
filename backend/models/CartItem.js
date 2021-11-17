@@ -4,6 +4,7 @@ const cartItemSchema = mongoose.Schema(
   {
     name: {
       type: String,
+      required: true,
     },
     quantity: {
       type: Number,
@@ -17,8 +18,13 @@ const cartItemSchema = mongoose.Schema(
       type: Number,
       min: 0,
     },
+    medicineID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Medicine",
+    },
     productID: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Stock",
     },
   },
   { timestamps: true }

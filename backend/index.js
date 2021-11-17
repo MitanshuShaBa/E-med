@@ -8,6 +8,9 @@ const authRoutes = require("./routes/auth");
 const manageRoutes = require("./routes/manage");
 const stockRoutes = require("./routes/stock");
 const orderRoutes = require("./routes/order");
+const notificationRoutes = require("./routes/notification");
+const reportRoutes = require("./routes/report");
+const paymentRoutes = require("./routes/payment");
 
 //Middlewares
 app.use(express.json());
@@ -19,6 +22,9 @@ app.use("/auth", authRoutes);
 app.use("/manage", manageRoutes);
 app.use("/stock", stockRoutes);
 app.use("/order", orderRoutes);
+app.use("/notification", notificationRoutes);
+app.use("/report", reportRoutes);
+app.use("/payment", paymentRoutes);
 
 // Custom Middlewares - Error handling
 app.use((err, req, res, next) => {

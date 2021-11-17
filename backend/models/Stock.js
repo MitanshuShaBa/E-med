@@ -3,33 +3,13 @@ const { isInt } = require("validator");
 
 const stockSchema = mongoose.Schema(
   {
-    name: {
-      type: String,
-      trim: true,
+    medicine: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Medicine",
       required: true,
     },
-    description: {
-      type: String,
-      trim: true,
-    },
-    imgCaption: {
-      type: String,
-      trim: true,
-    },
-    imgURLs: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
-    type: {
-      // type of product
-      type: String,
-      trim: true,
-    },
-    company: {
-      type: String,
-      trim: true,
+    expiry: {
+      type: Date,
     },
     price: {
       type: Number,

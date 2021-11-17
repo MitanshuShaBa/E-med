@@ -1,9 +1,14 @@
 import { Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 
-const Medicine = ({ _id, name, price, type, isMR, imgCaption }) => {
+const Medicine = ({
+  _id,
+  medicine: { name, type, imgCaption },
+  price,
+  isMR,
+}) => {
   return (
-    <Card style={{ marginBottom: "2vh", maxWidth: 345 }}>
+    <Card style={{ marginBottom: "2vh", width: 345 }}>
       <CardActionArea
         component={Link}
         to={isMR ? `/stock/${_id}` : `/product/${_id}`}

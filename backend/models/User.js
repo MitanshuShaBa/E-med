@@ -41,10 +41,13 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "staff", "pharmacist", "mr", "admin"],
       default: "user",
     },
-    managedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
+    managedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        unique: true,
+      },
+    ],
     userManagedBy: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -55,7 +58,7 @@ const userSchema = new mongoose.Schema(
     encry_password: {
       type: String,
       required: true,
-    }, // TODO add disabled field no access anymore
+    },
     salt: String,
   },
   {

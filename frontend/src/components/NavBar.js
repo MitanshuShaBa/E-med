@@ -8,6 +8,7 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import StoreIcon from "@mui/icons-material/Store";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 
 import {
   AppBar,
@@ -26,6 +27,7 @@ import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { useStateValue } from "../StateProvider";
 import { initialState } from "../reducer";
+import { LibraryBooks as OrdersIcon } from "@mui/icons-material";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -57,6 +59,18 @@ const NavBar = () => {
       display: token,
     },
     {
+      listIcon: <CollectionsBookmarkIcon />,
+      listText: "Catalog",
+      to: "/catalog",
+      display: token && role !== "user",
+    },
+    {
+      listIcon: <OrdersIcon />,
+      listText: "Manage Orders",
+      to: "/manage/orders",
+      display: token && role !== "user" && role !== "admin",
+    },
+    {
       listIcon: <CreateIcon />,
       listText: "Register",
       to: "/signup",
@@ -75,17 +89,16 @@ const NavBar = () => {
       display: token && role !== "user",
     },
     {
-      listIcon: <CollectionsBookmarkIcon />,
-      listText: "Catalog",
-      to: "/catalog",
-      display: token && role !== "user",
-    },
-    ,
-    {
       listIcon: <StoreIcon />,
       listText: "Manage Medicines",
       to: "/manage/medicines",
       display: token && role !== "user" && role !== "admin",
+    },
+    {
+      listIcon: <AssessmentIcon />,
+      listText: "Reports",
+      to: "/reports",
+      display: token && role !== "user" && role !== "staff",
     },
   ];
 

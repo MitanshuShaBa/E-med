@@ -12,25 +12,29 @@ const Product = ({ isMR }) => {
   const { id } = useParams();
   const [{ cart, user }, dispatch] = useStateValue();
   const [
-    { name, description, type, company, price, quantity = 0, imgURLs = null },
+    {
+      medicine: {
+        name = null,
+        description = null,
+        type = null,
+        company = null,
+      } = {},
+      price = 0,
+      quantity = 0,
+    },
     setProduct,
-  ] = useState({
-    name: null,
-    description: null,
-    type: null,
-    company: null,
-    price: null,
-  });
+  ] = useState({});
   const [images, setImages] = useState(null);
   useEffect(() => {
     server
       .get(isMR ? `/stock/mr/item/${id}` : `/stock/pharmacy/item/${id}`)
       .then(({ data }) => {
         setProduct(data);
-        const tmpImages = data.imgURLs.map((imgURL) => {
+        const tmpImages = data.medicine.imgURLs.map((imgURL) => {
           return {
             original: imgURL,
             thumbnail: imgURL,
+            originalHeight: "400rem",
           };
         });
         setImages(tmpImages);
@@ -57,7 +61,7 @@ const Product = ({ isMR }) => {
       <Typography variant="h4">{name}</Typography>
       {images && (
         <ImageGallery
-          // originalHeight={"10vh"}
+          // originalHeight={"40vh"}
           // thumbnailHeight={10}
           style={{ height: "10vh" }}
           autoPlay
@@ -81,17 +85,19 @@ const Product = ({ isMR }) => {
         </Button>
       ) : (
         <div style={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={() => handleChangeCart(1)}>
+          <IconButton
+            disabled={cart[id] >= quantity}
+            onClick={() => handleChangeCart(1)}
+          >
             <AddIcon />
           </IconButton>
           <Typography style={{ margin: "0 2vw" }}>{cart[id]}</Typography>
           <IconButton onClick={() => handleChangeCart(-1)}>
             <RemoveIcon />
           </IconButton>
-          {/* TODO add remove from cart dustbin icon */}
         </div>
       )}
-      <Typography variant="h5">Property Desciption</Typography>
+      <Typography variant="h5">Property Description</Typography>
       <Typography>{description}</Typography>
       <br />
       <Typography variant="h5">Type: {type} </Typography>

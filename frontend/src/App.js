@@ -12,6 +12,12 @@ import Product from "./components/Product";
 import Cart from "./components/cart/Cart";
 import ManageMedicines from "./components/manage/ManageMedicines";
 import AddMedicine from "./components/manage/AddMedicine";
+import Account from "./components/account/Account";
+import ManageOrders from "./components/manage/ManageOrders";
+import ForgotPassword from "./components/auth/ForgotPassword";
+import ChangePassword from "./components/auth/ChangePassword";
+import ManageOrder from "./components/manage/ManageOrder";
+import Reports from "./components/Reports";
 
 function App() {
   const [
@@ -24,10 +30,10 @@ function App() {
 
   useEffect(() => {
     const authStateChange = setInterval(() => {
-      const token = sessionStorage.getItem("token");
+      const sessionToken = sessionStorage.getItem("token");
       const user = JSON.parse(sessionStorage.getItem("user"));
-      if (token !== null) {
-        dispatch({ type: "SET_TOKEN", token });
+      if (sessionToken !== null) {
+        dispatch({ type: "SET_TOKEN", token: sessionToken });
         dispatch({ type: "SET_USER", user });
       } else {
         dispatch({ type: "SET_TOKEN", token: null });
@@ -54,18 +60,32 @@ function App() {
         <Route path="/cart">
           <Cart />
         </Route>
-        <Route path="/login">
-          <Login />
-        </Route>
-        <Route path="/signup">
-          <SignUp />
-        </Route>
+        {role !== null && (
+          <Route path="/account">
+            <Account />
+          </Route>
+        )}
+        {role !== "user" && role !== "admin" && role !== null && (
+          <Route path="/manage/orders" exact>
+            <ManageOrders />
+          </Route>
+        )}
+        {role !== "user" && role !== "admin" && role !== null && (
+          <Route path="/manage/order/:orderID" exact>
+            <ManageOrder />
+          </Route>
+        )}
+        {role !== "user" && role !== "staff" && role !== null && (
+          <Route path="/reports" exact>
+            <Reports />
+          </Route>
+        )}
         {role !== "user" && role !== null && (
           <Route path="/manage/users" exact>
             <ManageUsers />
           </Route>
         )}
-        {role !== "user" && role !== null && (
+        {role !== "user" && role !== "admin" && role !== null && (
           <Route path="/manage/medicines" exact>
             <ManageMedicines />
           </Route>
@@ -85,6 +105,18 @@ function App() {
             <AddMedicine />
           </Route>
         )}
+        <Route path="/login">
+          <Login />
+        </Route>
+        <Route path="/signup">
+          <SignUp />
+        </Route>
+        <Route path="/forgot-password">
+          <ForgotPassword />
+        </Route>
+        <Route path="/reset-password/:token">
+          <ChangePassword />
+        </Route>
         <Route>
           <NotFound />
         </Route>

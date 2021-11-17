@@ -1,12 +1,11 @@
 const Stock = require("../../models/Stock");
 
-exports.createStockForPharmacy = (req, res) => {
+exports.addStockForPharmacy = (req, res) => {
   const pharmacyStock = new Stock(req.body);
   pharmacyStock.save((err, stock) => {
     if (err) {
       return res.status(400).send({
         error: err,
-        debug: req.body.managedBy,
       });
     }
     res.send(stock);
@@ -14,19 +13,9 @@ exports.createStockForPharmacy = (req, res) => {
 };
 
 exports.getAllFromPharmacy = (_req, res) => {
-  Stock.find({ isMR: false, isAvailable: true }, [
-    "_id",
-    "name",
-    "description",
-    "type",
-    "company",
-    "price",
-    "quantity",
-    "managedBy",
-    "imgCaption",
-    "imgURLs",
-  ])
-    .populate("managedBy", ["_id", "name"].join(" "))
+  Stock.find({ isMR: false, isAvailable: true })
+    .populate("managedBy", "-encry_password -salt")
+    .populate("medicine")
     .exec((err, items) => {
       if (err) {
         return res.status(400).send({
@@ -40,21 +29,9 @@ exports.getAllFromPharmacy = (_req, res) => {
 
 exports.getAllFromSpecificPharmacy = (req, res) => {
   const { pharmacyID } = req.params;
-  Stock.find({ isMR: false, managedBy: pharmacyID }, [
-    "_id",
-    "name",
-    "description",
-    "type",
-    "company",
-    "price",
-    "cost",
-    "quantity",
-    "isAvailable",
-    "managedBy",
-    "imgCaption",
-    "imgURLs",
-  ])
-    .populate("managedBy", ["_id", "name"].join(" "))
+  Stock.find({ isMR: false, managedBy: pharmacyID })
+    .populate("managedBy", "-encry_password -salt")
+    .populate("medicine")
     .exec((err, items) => {
       if (err) {
         return res.status(400).send({ error: err });
@@ -66,21 +43,9 @@ exports.getAllFromSpecificPharmacy = (req, res) => {
 
 exports.getItemFromPharmacy = (req, res) => {
   const { stockID } = req.params;
-  Stock.findOne({ _id: stockID }, [
-    "_id",
-    "name",
-    "description",
-    "type",
-    "company",
-    "price",
-    "cost",
-    "quantity",
-    "isAvailable",
-    "managedBy",
-    "imgCaption",
-    "imgURLs",
-  ])
-    .populate("managedBy", ["_id", "name"].join(" "))
+  Stock.findOne({ _id: stockID })
+    .populate("managedBy", "-encry_password -salt")
+    .populate("medicine")
     .exec((err, items) => {
       if (err) {
         return res.status(400).send({ error: err });
@@ -92,23 +57,24 @@ exports.getItemFromPharmacy = (req, res) => {
 
 exports.updateItemFromPharmacy = (req, res) => {
   const { _id } = req.body;
-  Stock.findOneAndUpdate({ _id }, { ...req.body }).exec((err, result) => {
-    if (err) {
-      return res.status(400).send({ error: err });
-    }
+  Stock.findOneAndUpdate({ _id, isMR: false }, { ...req.body }).exec(
+    (err, _result) => {
+      if (err) {
+        return res.status(400).send({ error: err });
+      }
 
-    res.send({ msg: "Updated successfully" });
-  });
+      res.send({ msg: "Updated successfully" });
+    }
+  );
 };
 
 exports.deleteItemFromPharmacy = (req, res) => {
   const { stockID } = req.params;
-  Stock.findOneAndDelete({ _id: stockID }).exec((err, _result) => {
+  Stock.findOneAndDelete({ _id: stockID, isMR: false }).exec((err, _result) => {
     if (err) {
       return res.status(400).send({ error: err });
     }
 
-    // TODO delete from the firebase storage
     res.send({ msg: "successfully deleted" });
   });
 };

@@ -6,8 +6,11 @@ import {
   Typography,
   Link,
   Button,
+  Tabs,
+  Tab,
+  Autocomplete,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink, useHistory } from "react-router-dom";
 import { storage } from "../../firebase";
 import { useStateValue } from "../../StateProvider";
@@ -19,20 +22,27 @@ const AddMedicine = () => {
   const history = useHistory();
   const [item, setItem] = useState(null);
   const [images, setImages] = useState(null);
+  const [tabValue, setTabValue] = useState(0);
   const isMR = user.role === "mr";
+  const [medicines, setMedicines] = useState([]);
+
+  useEffect(() => {
+    server.get("/stock/all").then(({ data }) => {
+      const tmp = data.map((item) => ({
+        ...item,
+        label: item.name,
+        id: item._id,
+      }));
+      setMedicines(tmp);
+    });
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const _id = "6164456a5aa2b1b31f197a92";
-    console.log(item);
-    console.log(images);
 
     Promise.all(
       [...images].map((image) =>
-        uploadBytes(
-          ref(storage, `${Date.now()}.${image?.type?.split("/")[1]}`),
-          image
-        )
+        uploadBytes(ref(storage, `${Date.now()}-${image.name}`), image)
       )
     )
       .then((snapshots) => {
@@ -48,14 +58,60 @@ const AddMedicine = () => {
               managedBy: user._id,
               imgURLs,
               imgCaption,
+              isNew: true,
             })
             .then(({ data }) => {
               console.log(data);
               history.push("/manage/medicines");
+            })
+            .catch((err) => {
+              console.log(err);
+              alert("Unable to add medicine");
             });
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const addStock = (e) => {
+    e.preventDefault();
+
+    // console.log(item);
+    Promise.all(
+      [...images].map((image) =>
+        uploadBytes(ref(storage, `${Date.now()}-${image.name}`), image)
+      )
+    )
+      .then((snapshots) => {
+        Promise.all(
+          snapshots.map((snapshot) => getDownloadURL(snapshot.ref))
+        ).then((imgURLs) => {
+          const imgCaption = imgURLs[0];
+          server
+            .post("/stock/mr/add", {
+              ...item,
+              medicine: item.medicine._id,
+              isAvailable: true,
+              isMR,
+              managedBy: user._id,
+              imgURLs,
+              imgCaption,
+            })
+            .then(({ data }) => {
+              console.log(data);
+              history.push("/manage/medicines");
+            })
+            .catch((err) => {
+              console.log(err);
+              alert("Unable to add medicine");
+            });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleChange = (e) => {
@@ -79,6 +135,10 @@ const AddMedicine = () => {
     });
   };
 
+  const handleChangeTabValue = (_e, newValue) => {
+    setTabValue(newValue);
+  };
+
   return (
     <Container style={{ marginTop: "2vh" }}>
       <Breadcrumbs
@@ -90,98 +150,184 @@ const AddMedicine = () => {
         </Link>
         <Typography color="primary">Add</Typography>
       </Breadcrumbs>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Name"
-          name="name"
-          onChange={handleChange}
-          value={item?.name}
-          required
-        />
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Description"
-          name="description"
-          multiline
-          maxRows={4}
-          onChange={handleChange}
-          value={item?.description}
-          required
-        />
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Type"
-          name="type"
-          onChange={handleChange}
-          value={item?.type}
-          required
-        />
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Company"
-          name="company"
-          onChange={handleChange}
-          value={item?.company}
-          required
-        />
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Price"
-          name="price"
-          onChange={handleChangeNumber}
-          value={item?.price}
-          type="number"
-          required
-        />
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Cost"
-          name="cost"
-          onChange={handleChangeNumber}
-          value={item?.cost}
-          type="number"
-          required
-        />
-        <TextField
-          //   error={isError && errors.name}
-          fullWidth
-          style={{ marginBottom: "2vh" }}
-          label="Quantity"
-          name="quantity"
-          onChange={handleChangeNumber}
-          value={item?.quantity}
-          type="number"
-          required
-        />
-        <TextField
-          fullWidth
-          required
-          style={{ marginBottom: "2vh" }}
-          name="images"
-          type="file"
-          inputProps={{ accept: "image/png,image/jpeg", multiple: true }}
-          onChange={handleChangeFiles}
-          variant="outlined"
-          defaultValue=""
-        />
-        <br />
-        <Button variant="contained" type="submit">
-          Submit
-        </Button>
-      </form>
+      <Tabs
+        style={{ marginBottom: "2vh" }}
+        value={tabValue}
+        onChange={handleChangeTabValue}
+      >
+        <Tab label={"Add Stock"} id={`simple-tab-0`} />
+        <Tab label={"Add Medicine"} id={`simple-tab-1`} />
+      </Tabs>
+      {tabValue === 0 && (
+        <form onSubmit={addStock}>
+          <Autocomplete
+            disablePortal
+            id="medicine"
+            options={medicines}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                style={{ marginBottom: "2vh" }}
+                label="Medicine"
+                name="medicine"
+                // onChange={handleChange}
+                value={item?.medicine?.name}
+                required
+              />
+            )}
+            onChange={(e) => {
+              const idx = e.target.id.split("-").slice(-1)[0];
+              setItem((prevState) => ({
+                ...prevState,
+                medicine: medicines[idx],
+              }));
+            }}
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Price"
+            name="price"
+            onChange={handleChangeNumber}
+            value={item?.price}
+            type="number"
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Cost"
+            name="cost"
+            onChange={handleChangeNumber}
+            value={item?.cost}
+            type="number"
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Quantity"
+            name="quantity"
+            onChange={handleChangeNumber}
+            value={item?.quantity}
+            type="number"
+            required
+          />
+          <TextField
+            fullWidth
+            required
+            style={{ marginBottom: "2vh" }}
+            name="images"
+            type="file"
+            inputProps={{ accept: "image/png,image/jpeg", multiple: true }}
+            onChange={handleChangeFiles}
+            variant="outlined"
+            defaultValue=""
+          />
+          <br />
+          <Button variant="contained" type="submit">
+            Submit
+          </Button>
+        </form>
+      )}
+      {tabValue === 1 && (
+        <form onSubmit={handleSubmit}>
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Name"
+            name="name"
+            onChange={handleChange}
+            value={item?.name}
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Description"
+            name="description"
+            multiline
+            maxRows={4}
+            onChange={handleChange}
+            value={item?.description}
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Type"
+            name="type"
+            onChange={handleChange}
+            value={item?.type}
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Company"
+            name="company"
+            onChange={handleChange}
+            value={item?.company}
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Price"
+            name="price"
+            onChange={handleChangeNumber}
+            value={item?.price}
+            type="number"
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Cost"
+            name="cost"
+            onChange={handleChangeNumber}
+            value={item?.cost}
+            type="number"
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Quantity"
+            name="quantity"
+            onChange={handleChangeNumber}
+            value={item?.quantity}
+            type="number"
+            required
+          />
+          <TextField
+            fullWidth
+            required
+            style={{ marginBottom: "2vh" }}
+            name="images"
+            type="file"
+            inputProps={{ accept: "image/png,image/jpeg", multiple: true }}
+            onChange={handleChangeFiles}
+            variant="outlined"
+            defaultValue=""
+          />
+          <br />
+          <Button variant="contained" type="submit">
+            Submit
+          </Button>
+        </form>
+      )}
     </Container>
   );
 };

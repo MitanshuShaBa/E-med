@@ -48,8 +48,8 @@ const ManageMedicines = () => {
   }, [rerender]);
 
   useEffect(() => {
-    const searchResults = medicines.filter((medicine) =>
-      medicine.name.toLowerCase().includes(query.toLowerCase())
+    const searchResults = medicines?.filter((medicine) =>
+      medicine?.medicine?.name?.toLowerCase().includes(query.toLowerCase())
     );
     setSearchResults(searchResults);
   }, [query, medicines]);
@@ -112,17 +112,19 @@ const ManageMedicines = () => {
             Medicines
           </Typography>
 
-          <Tooltip title="Add">
-            <Fab
-              sx={{ margin: (theme) => theme.spacing(1) }}
-              component={Link}
-              size="small"
-              color="primary"
-              to="/medicine/add"
-            >
-              <AddIcon style={{ color: "white" }} />
-            </Fab>
-          </Tooltip>
+          {user.role === "mr" && (
+            <Tooltip title="Add">
+              <Fab
+                sx={{ margin: (theme) => theme.spacing(1) }}
+                component={Link}
+                size="small"
+                color="primary"
+                to="/medicine/add"
+              >
+                <AddIcon style={{ color: "white" }} />
+              </Fab>
+            </Tooltip>
+          )}
         </div>
 
         <TextField
@@ -159,11 +161,8 @@ const ManageMedicines = () => {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map(
                 ({
-                  name,
                   _id,
-                  description,
-                  type,
-                  company,
+                  medicine: { name, description, type, company },
                   price,
                   cost,
                   quantity,
@@ -171,66 +170,16 @@ const ManageMedicines = () => {
                 }) => (
                   <TableRow key={_id}>
                     <TableCell>
-                      {editing && _id === currentItem._id ? (
-                        <form onSubmit={handleSubmit}>
-                          <TextField
-                            name="name"
-                            onChange={handleChange}
-                            value={currentItem.name}
-                            variant="outlined"
-                            required
-                          />
-                        </form>
-                      ) : (
-                        <span>{name}</span>
-                      )}
+                      <span>{name}</span>
                     </TableCell>
                     <TableCell>
-                      {editing && _id === currentItem._id ? (
-                        <form onSubmit={handleSubmit}>
-                          <TextField
-                            name="description"
-                            multiline
-                            maxRows={4}
-                            onChange={handleChange}
-                            value={currentItem.description}
-                            variant="outlined"
-                            required
-                          />
-                        </form>
-                      ) : (
-                        <span>{description.slice(0, 10)}...</span>
-                      )}
+                      <span>{description.slice(0, 10)}...</span>
                     </TableCell>
                     <TableCell>
-                      {editing && _id === currentItem._id ? (
-                        <form onSubmit={handleSubmit}>
-                          <TextField
-                            name="type"
-                            onChange={handleChange}
-                            value={currentItem.type}
-                            variant="outlined"
-                            required
-                          />
-                        </form>
-                      ) : (
-                        <span>{type}</span>
-                      )}
+                      <span>{type}</span>
                     </TableCell>
                     <TableCell>
-                      {editing && _id === currentItem._id ? (
-                        <form onSubmit={handleSubmit}>
-                          <TextField
-                            name="company"
-                            onChange={handleChange}
-                            value={currentItem.company}
-                            variant="outlined"
-                            required
-                          />
-                        </form>
-                      ) : (
-                        <span>{company}</span>
-                      )}
+                      <span>{company}</span>
                     </TableCell>
                     <TableCell>
                       {editing && _id === currentItem._id ? (
@@ -249,20 +198,7 @@ const ManageMedicines = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {editing && _id === currentItem._id ? (
-                        <form onSubmit={handleSubmit}>
-                          <TextField
-                            name="cost"
-                            type="number"
-                            onChange={handleChangeNumber}
-                            value={currentItem.cost}
-                            variant="outlined"
-                            required
-                          />
-                        </form>
-                      ) : (
-                        <span>₹ {cost}</span>
-                      )}
+                      <span>₹ {cost}</span>
                     </TableCell>
                     <TableCell>
                       {editing && _id === currentItem._id ? (
@@ -316,13 +252,13 @@ const ManageMedicines = () => {
                           </IconButton>
                         </Tooltip>
                       )}
-                      <Tooltip title="Delete">
+                      {/* <Tooltip title="Delete">
                         <IconButton
                         // onClick={() => openDialog(menuItem)}
                         >
                           <DeleteIcon color="error" />
                         </IconButton>
-                      </Tooltip>
+                      </Tooltip> */}
                     </TableCell>
                   </TableRow>
                 )

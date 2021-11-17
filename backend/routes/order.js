@@ -20,5 +20,6 @@ router.get("/mr/order/:orderID", getOrder);
 router.patch("/mr", updateOrder);
 
 router.get("/user/:userID", getOrdersOfUser);
+router.patch("/:orderID", updateOrder);
 
 module.exports = router;

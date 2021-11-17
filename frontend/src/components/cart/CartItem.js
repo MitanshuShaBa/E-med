@@ -5,7 +5,13 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Link, Redirect } from "react-router-dom";
 
-const CartItem = ({ name, price, _id, quantity, causeReRender }) => {
+const CartItem = ({
+  medicine: { name, imgCaption },
+  price,
+  _id,
+  quantity,
+  causeReRender,
+}) => {
   const [{ cart, user }, dispatch] = useStateValue();
   const handleChangeCart = (change) => {
     let tmpCart = { ...cart };
@@ -35,7 +41,7 @@ const CartItem = ({ name, price, _id, quantity, causeReRender }) => {
               paddingLeft: "2vw",
               width: "90%",
             }}
-            // TODO src={imgURL}
+            src={imgCaption}
             alt={name}
           />
         </div>
@@ -54,7 +60,6 @@ const CartItem = ({ name, price, _id, quantity, causeReRender }) => {
               <IconButton onClick={() => handleChangeCart(-1)}>
                 <RemoveIcon />
               </IconButton>
-              {/* TODO add remove from cart dustbin icon */}
             </div>
             <Typography>
               Total: ₹

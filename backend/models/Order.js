@@ -9,6 +9,12 @@ const orderSchema = mongoose.Schema(
         type: CartItem,
       },
     ],
+    prescriptions: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     address: {
       type: String,
       trim: true,
@@ -38,18 +44,29 @@ const orderSchema = mongoose.Schema(
     total: {
       type: Number,
     },
-    verified: {
+    paid: {
       type: Boolean,
       default: false,
     },
-    paid: {
-      type: Boolean,
-      default: true, // TODO remove after implementation of payment portal
+    razorpay_order_id: {
+      type: String,
+    },
+    razorpay_payment_id: {
+      type: String,
     },
     status: {
       type: String,
-      enum: ["verifying", "processing", "delivering", "completed"],
-      default: "verifying",
+      enum: [
+        "prescriptionRequired",
+        "paymentPending",
+        "verifying",
+        "processing",
+        "delivering",
+        "completed",
+        "cancelled",
+        "returned",
+      ],
+      default: "paymentPending",
     },
   },
   {
