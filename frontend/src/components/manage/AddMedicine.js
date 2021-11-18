@@ -79,38 +79,21 @@ const AddMedicine = () => {
     e.preventDefault();
 
     // console.log(item);
-    Promise.all(
-      [...images].map((image) =>
-        uploadBytes(ref(storage, `${Date.now()}-${image.name}`), image)
-      )
-    )
-      .then((snapshots) => {
-        Promise.all(
-          snapshots.map((snapshot) => getDownloadURL(snapshot.ref))
-        ).then((imgURLs) => {
-          const imgCaption = imgURLs[0];
-          server
-            .post("/stock/mr/add", {
-              ...item,
-              medicine: item.medicine._id,
-              isAvailable: true,
-              isMR,
-              managedBy: user._id,
-              imgURLs,
-              imgCaption,
-            })
-            .then(({ data }) => {
-              console.log(data);
-              history.push("/manage/medicines");
-            })
-            .catch((err) => {
-              console.log(err);
-              alert("Unable to add medicine");
-            });
-        });
+    server
+      .post("/stock/mr/add", {
+        ...item,
+        medicine: item.medicine._id,
+        isAvailable: true,
+        isMR,
+        managedBy: user._id,
+      })
+      .then(({ data }) => {
+        console.log(data);
+        history.push("/manage/medicines");
       })
       .catch((err) => {
         console.log(err);
+        alert("Unable to add medicine");
       });
   };
 
@@ -216,17 +199,6 @@ const AddMedicine = () => {
             value={item?.quantity}
             type="number"
             required
-          />
-          <TextField
-            fullWidth
-            required
-            style={{ marginBottom: "2vh" }}
-            name="images"
-            type="file"
-            inputProps={{ accept: "image/png,image/jpeg", multiple: true }}
-            onChange={handleChangeFiles}
-            variant="outlined"
-            defaultValue=""
           />
           <br />
           <Button variant="contained" type="submit">
