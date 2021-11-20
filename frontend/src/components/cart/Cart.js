@@ -119,26 +119,28 @@ const Cart = () => {
   const handleBuyCart = (imgURLs) => {
     let sellers = [];
     // console.log(medicines);
-    const tmpItems = medicines.map(
-      ({
+    const tmpItems = medicines.map((item) => {
+      const {
         medicine: { _id: medID, name },
         price,
         cost,
         cartQuantity,
         managedBy,
+        expiry,
         _id,
-      }) => {
-        sellers.push(managedBy._id);
-        return {
-          name,
-          price,
-          cost,
-          quantity: cartQuantity,
-          medicineID: medID,
-          productID: _id,
-        };
-      }
-    );
+      } = item;
+      sellers.push(managedBy._id);
+      return {
+        name,
+        price,
+        cost,
+        expiry,
+        duration: item.duration,
+        quantity: cartQuantity,
+        medicineID: medID,
+        productID: _id,
+      };
+    });
     const order = {
       items: tmpItems,
       prescriptions: imgURLs,

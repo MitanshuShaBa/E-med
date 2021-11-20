@@ -16,11 +16,14 @@ import { storage } from "../../firebase";
 import { useStateValue } from "../../StateProvider";
 import { server } from "../../utils";
 import { getDownloadURL, ref, uploadBytes } from "@firebase/storage";
+import moment from "moment";
 
 const AddMedicine = () => {
   const [{ user }] = useStateValue();
   const history = useHistory();
-  const [item, setItem] = useState(null);
+  const [item, setItem] = useState({
+    expiry: moment(new Date()).format("YYYY-M-D"),
+  });
   const [images, setImages] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const isMR = user.role === "mr";
@@ -200,6 +203,17 @@ const AddMedicine = () => {
             type="number"
             required
           />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Expiry"
+            name="expiry"
+            onChange={handleChange}
+            value={item?.expiry}
+            type="date"
+            required
+          />
           <br />
           <Button variant="contained" type="submit">
             Submit
@@ -281,6 +295,17 @@ const AddMedicine = () => {
             onChange={handleChangeNumber}
             value={item?.quantity}
             type="number"
+            required
+          />
+          <TextField
+            //   error={isError && errors.name}
+            fullWidth
+            style={{ marginBottom: "2vh" }}
+            label="Expiry"
+            name="expiry"
+            onChange={handleChange}
+            value={item?.expiry}
+            type="date"
             required
           />
           <TextField

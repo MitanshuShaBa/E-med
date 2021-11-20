@@ -11,6 +11,9 @@ const stockSchema = mongoose.Schema(
     expiry: {
       type: Date,
     },
+    duration: {
+      type: Number,
+    },
     price: {
       type: Number,
       min: 0,

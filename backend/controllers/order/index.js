@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const luxon = require("luxon");
+const Alert = require("../../models/Alert");
 const Order = require("../../models/Order");
 const Stock = require("../../models/Stock");
 
@@ -78,13 +80,20 @@ exports.updateOrder = async (req, res) => {
 
   //   res.send({ msg: "Updated successfully" });
   // });
-  const order = await Order.findById(_id).populate("buyer");
+  const order = await Order.findById(_id).populate(
+    "buyer seller items.medicineID items.productID"
+  );
+
+  // console.log(order);
+  // console.log(order.items);
 
   if (req.body.status === "completed" && order.buyer.role === "pharmacist") {
     const session = await mongoose.startSession();
     try {
       await session.withTransaction(async () => {
-        const order = await Order.findById(_id).session(session);
+        const order = await Order.findById(_id)
+          .populate("items.productID")
+          .session(session);
         order.status = "completed";
 
         for (const item of order?.items) {
@@ -98,7 +107,7 @@ exports.updateOrder = async (req, res) => {
 
           await stock.save();
 
-          await Stock.create(
+          const newStock = await Stock.create(
             [
               {
                 medicine: stock.medicine,
@@ -113,6 +122,15 @@ exports.updateOrder = async (req, res) => {
             ],
             { session: session }
           );
+
+          const alert = new Alert({
+            sender: item.productID.managedBy,
+            receiver: order.buyer._id,
+          });
+          alert.triggerQuantity = Math.floor(item.quantity * 0.1);
+          alert.stock = newStock[0]._id;
+          alert.message = `It's time to refill your medicines for ${item.name}`;
+          alert.save();
         }
         await order.save();
       });
@@ -120,6 +138,7 @@ exports.updateOrder = async (req, res) => {
       console.log(e);
     }
     session.endSession();
+
     return res.send("Transaction complete");
   } else if (req.body.status === "completed" && order.buyer.role === "user") {
     const session = await mongoose.startSession();
@@ -149,6 +168,23 @@ exports.updateOrder = async (req, res) => {
       console.log(e);
     }
     session.endSession();
+
+    order.items.map((item) => {
+      const alert = new Alert({
+        sender: item.productID.managedBy,
+        receiver: order.buyer._id,
+      });
+      const expiryDate = luxon.DateTime.fromJSDate(
+        new Date(item.productID.expiry)
+      );
+      const duration = luxon.DateTime.now().plus(
+        luxon.Duration.fromObject({ days: item.productID.duration })
+      );
+      alert.triggerDate = expiryDate < duration ? expiryDate : duration;
+      alert.message = `It's time to refill your medicines for ${item.name}`;
+      alert.save();
+    });
+
     return res.send("Transaction complete");
   } else {
     Order.findOneAndUpdate({ _id }, { ...req.body }).exec((err, order) => {

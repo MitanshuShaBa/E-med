@@ -70,7 +70,7 @@ const ManageOrder = ({ isBuyer }) => {
         .catch((err) => console.log(err));
       server
         .post("/notification/email", {
-          email: user.email,
+          email: order.buyer.email,
           message: `Order #${orderID} Cancelled`,
         })
         .catch((err) => console.log(err));
@@ -92,7 +92,7 @@ const ManageOrder = ({ isBuyer }) => {
         .catch((err) => console.log(err));
       server
         .post("/notification/email", {
-          email: user.email,
+          email: order.buyer.email,
           message: `Order #${orderID} requires prescription`,
         })
         .catch((err) => console.log(err));
@@ -114,7 +114,7 @@ const ManageOrder = ({ isBuyer }) => {
         .catch((err) => console.log(err));
       server
         .post("/notification/email", {
-          email: user.email,
+          email: order.buyer.email,
           message: `Order #${orderID} is now ${stages[status].next}`,
         })
         .catch((err) => console.log(err));

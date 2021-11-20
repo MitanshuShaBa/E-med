@@ -18,6 +18,12 @@ const cartItemSchema = mongoose.Schema(
       type: Number,
       min: 0,
     },
+    expiry: {
+      type: Date,
+    },
+    duration: {
+      type: Number,
+    },
     medicineID: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Medicine",
