@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useStateValue } from "../../StateProvider";
 import { server } from "../../utils";
+import moment from "moment";
 
 const ManageMedicines = () => {
   const [{ user }] = useStateValue();
@@ -152,7 +153,9 @@ const ManageMedicines = () => {
               <TableCell>Price</TableCell>
               <TableCell>Cost</TableCell>
               <TableCell>Quantity</TableCell>
-              <TableCell>Availabilty</TableCell>
+              <TableCell>Expiry</TableCell>
+              {user.role !== "mr" && <TableCell>Duration</TableCell>}
+              <TableCell>Availability</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
@@ -166,6 +169,8 @@ const ManageMedicines = () => {
                   price,
                   cost,
                   quantity,
+                  expiry,
+                  duration,
                   isAvailable,
                 }) => (
                   <TableRow key={_id}>
@@ -216,6 +221,27 @@ const ManageMedicines = () => {
                         <span>{quantity}</span>
                       )}
                     </TableCell>
+                    <TableCell>
+                      <span>{moment(new Date(expiry)).format("D/M/YY")}</span>
+                    </TableCell>
+                    {user.role != "mr" && (
+                      <TableCell>
+                        {editing && _id === currentItem._id ? (
+                          <form onSubmit={handleSubmit}>
+                            <TextField
+                              name="duration"
+                              type="number"
+                              onChange={handleChangeNumber}
+                              value={currentItem.duration}
+                              variant="outlined"
+                              required
+                            />
+                          </form>
+                        ) : (
+                          <span>{duration}</span>
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Tooltip title="Change Availability">
                         <Switch

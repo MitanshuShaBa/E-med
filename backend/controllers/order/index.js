@@ -3,6 +3,7 @@ const luxon = require("luxon");
 const Alert = require("../../models/Alert");
 const Order = require("../../models/Order");
 const Stock = require("../../models/Stock");
+const User = require("../../models/User");
 
 exports.createOrder = (req, res) => {
   const pharmacyOrder = new Order(req.body);
@@ -96,6 +97,12 @@ exports.updateOrder = async (req, res) => {
           .session(session);
         order.status = "completed";
 
+        const buyer = await User.findById(order.buyer).session(session);
+        buyer.managedBy = Array.from(
+          new Set([...buyer.managedBy, ...order.seller])
+        );
+        buyer.save();
+
         for (const item of order?.items) {
           const stock = await Stock.findById(item.productID).session(session);
 
@@ -112,6 +119,7 @@ exports.updateOrder = async (req, res) => {
               {
                 medicine: stock.medicine,
                 expiry: stock.expiry,
+                duration: 30,
                 cost: item.price,
                 price: item.price,
                 quantity: item.quantity,
@@ -128,6 +136,9 @@ exports.updateOrder = async (req, res) => {
             receiver: order.buyer._id,
           });
           alert.triggerQuantity = Math.floor(item.quantity * 0.1);
+          if (alert.triggerQuantity <= 0) {
+            alert.triggerQuantity = 1;
+          }
           alert.stock = newStock[0]._id;
           alert.message = `It's time to refill your medicines for ${item.name}`;
           alert.save();
@@ -146,6 +157,12 @@ exports.updateOrder = async (req, res) => {
       await session.withTransaction(async () => {
         const order = await Order.findById(_id).session(session);
         order.status = "completed";
+
+        const buyer = await User.findById(order.buyer).session(session);
+        buyer.userManagedBy = Array.from(
+          new Set([...buyer.userManagedBy, ...order.seller])
+        );
+        buyer.save();
 
         for (const item of order?.items) {
           const stock = await Stock.findById(item.productID).session(session);
