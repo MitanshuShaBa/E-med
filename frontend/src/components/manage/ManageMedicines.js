@@ -81,7 +81,9 @@ const ManageMedicines = () => {
     e.preventDefault();
 
     server
-      .patch("/stock/pharmacy/item", { ...currentItem })
+      .patch(`/stock/${user.role === "mr" ? "mr" : "pharmacy"}/item`, {
+        ...currentItem,
+      })
       .then(() => setRerender(rerender + 1))
       .catch((err) => console.log(err.response.data.error));
 
@@ -90,7 +92,10 @@ const ManageMedicines = () => {
 
   const toggleAvailability = (_id, availability) => {
     server
-      .patch("/stock/pharmacy/item", { _id, isAvailable: !availability })
+      .patch(`/stock/${user.role === "mr" ? "mr" : "pharmacy"}/item`, {
+        _id,
+        isAvailable: !availability,
+      })
       .then(() => setRerender(rerender + 1))
       .catch((err) => console.log(err.response.data.error));
   };
