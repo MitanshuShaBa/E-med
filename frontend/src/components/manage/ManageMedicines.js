@@ -271,6 +271,7 @@ const ManageMedicines = () => {
                                 price,
                                 cost,
                                 quantity,
+                                duration,
                               })
                             }
                           >
