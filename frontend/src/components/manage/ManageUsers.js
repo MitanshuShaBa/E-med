@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { server } from "../../utils";
 import { useStateValue } from "../../StateProvider";
 import { Add as AddIcon, SettingsInputComponent } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ManageUsers = () => {
   const [
@@ -224,13 +225,14 @@ const CustomTable = ({ query, url, rerender }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchResults, setSearchResults] = useState([]);
   const [users, setUsers] = useState([]);
+  const [{ user }] = useStateValue();
 
   useEffect(() => {
     server
       .get(url)
       .then(({ data }) => setUsers(data))
       .catch((err) => console.log(err.response.data.error));
-  }, [url, rerender]);
+  }, [url, rerender, user]);
 
   useEffect(() => {
     const tmpSearchResults = users.filter((user) =>
@@ -257,6 +259,7 @@ const CustomTable = ({ query, url, rerender }) => {
               <TableCell>Email</TableCell>
               {/* <TableCell>Phone</TableCell> */}
               <TableCell>Role</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -269,6 +272,26 @@ const CustomTable = ({ query, url, rerender }) => {
                   <TableCell style={{ textTransform: "capitalize" }}>
                     {role === "mr" ? "Medical Representative" : role}
                   </TableCell>
+                  {user?.role === "pharmacist" && role === "staff" ? (
+                    <TableCell>
+                      <IconButton
+                        onClick={() => {
+                          const removeStaff = window.confirm(
+                            "Are you sure you want to delete " + name
+                          );
+                          if (removeStaff) {
+                            server
+                              .delete("/manage/staff/remove/" + _id)
+                              .catch((err) => console.log(err));
+                          }
+                        }}
+                      >
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </TableCell>
+                  ) : (
+                    <TableCell />
+                  )}
                 </TableRow>
               ))}
           </TableBody>

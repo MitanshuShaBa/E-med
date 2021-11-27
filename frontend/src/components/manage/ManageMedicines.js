@@ -43,7 +43,8 @@ const ManageMedicines = () => {
     server
       .get(`/stock/${user.role === "mr" ? "mr" : "pharmacy"}/${user._id}`)
       .then(({ data }) => {
-        setMedicines(data);
+        const tmpMedicines = data.filter((stock) => stock.quantity !== 0);
+        setMedicines(tmpMedicines);
       })
       .catch((err) => console.log(err));
   }, [rerender]);

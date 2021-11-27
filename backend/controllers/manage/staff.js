@@ -59,10 +59,10 @@ exports.updateStaffInfo = (req, res) => {
 };
 
 exports.deleteStaff = (req, res) => {
-  const { userID } = req.body;
-  User.findOneAndDelete(userID).exec((err, _user) => {
-    if (err) {
-      res.status(400).send({ error: err });
+  const { userID } = req.params;
+  User.findOneAndDelete({ _id: userID }).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).send({ error: err });
     }
 
     res.send({ msg: "Success" });

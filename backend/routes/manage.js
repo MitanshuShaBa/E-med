@@ -55,6 +55,6 @@ router.get("/staffs/:pharmacyID", getStaff);
 router.get("/staffs", getAllStaff);
 router.post("staff/create"); //TODO
 router.patch("/staff/info", updateStaffInfo);
-router.delete("/staff/remove", deleteStaff);
+router.delete("/staff/remove/:userID", deleteStaff);
 
 module.exports = router;
