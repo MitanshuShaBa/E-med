@@ -140,7 +140,7 @@ exports.updateOrder = async (req, res) => {
             alert.triggerQuantity = 1;
           }
           alert.stock = newStock[0]._id;
-          alert.message = `It's time to refill your medicines for ${item.name}. You can find the medicine at ${process.env.FRONTEND_URL}/product/${item.productID._id}`;
+          alert.message = `It's time to refill your medicines for ${item.name}. You can find the medicine at ${process.env.FRONTEND_URL}/stock/${item.productID._id}`;
           alert.save();
         }
         await order.save();
