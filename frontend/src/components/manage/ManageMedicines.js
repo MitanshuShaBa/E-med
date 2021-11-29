@@ -160,7 +160,11 @@ const ManageMedicines = () => {
               <TableCell>Cost</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Expiry</TableCell>
-              {user.role !== "mr" && <TableCell>Duration</TableCell>}
+              {user.role !== "mr" && (
+                <Tooltip title="Duration in days after which reminder should be sent to customer">
+                  <TableCell>Duration</TableCell>
+                </Tooltip>
+              )}
               <TableCell>Availability</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -244,7 +248,7 @@ const ManageMedicines = () => {
                             />
                           </form>
                         ) : (
-                          <span>{duration}</span>
+                          <span>{duration === 0 ? "None" : duration}</span>
                         )}
                       </TableCell>
                     )}

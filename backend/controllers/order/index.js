@@ -119,7 +119,7 @@ exports.updateOrder = async (req, res) => {
               {
                 medicine: stock.medicine,
                 expiry: stock.expiry,
-                duration: 30,
+                duration: 0,
                 cost: item.price,
                 price: item.price,
                 quantity: item.quantity,
@@ -187,19 +187,21 @@ exports.updateOrder = async (req, res) => {
     session.endSession();
 
     order.items.map((item) => {
-      const alert = new Alert({
-        sender: item.productID.managedBy,
-        receiver: order.buyer._id,
-      });
-      const expiryDate = luxon.DateTime.fromJSDate(
-        new Date(item.productID.expiry)
-      );
-      const duration = luxon.DateTime.now().plus(
-        luxon.Duration.fromObject({ days: item.productID.duration })
-      );
-      alert.triggerDate = expiryDate < duration ? expiryDate : duration;
-      alert.message = `It's time to refill your medicines for ${item.name}. You can find the medicine at ${process.env.FRONTEND_URL}/product/${item.productID._id}`;
-      alert.save();
+      if (item.productID.duration > 0) {
+        const alert = new Alert({
+          sender: item.productID.managedBy,
+          receiver: order.buyer._id,
+        });
+        const expiryDate = luxon.DateTime.fromJSDate(
+          new Date(item.productID.expiry)
+        );
+        const duration = luxon.DateTime.now().plus(
+          luxon.Duration.fromObject({ days: item.productID.duration })
+        );
+        alert.triggerDate = expiryDate < duration ? expiryDate : duration;
+        alert.message = `It's time to refill your medicines for ${item.name}. You can find the medicine at ${process.env.FRONTEND_URL}/product/${item.productID._id}`;
+        alert.save();
+      }
     });
 
     return res.send("Transaction complete");
