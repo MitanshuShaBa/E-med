@@ -187,7 +187,7 @@ exports.updateOrder = async (req, res) => {
     session.endSession();
 
     order.items.map((item) => {
-      if (item.productID.duration > 0) {
+      if (item.productID.duration > 0 && order.prescriptions.length > 0) {
         const alert = new Alert({
           sender: item.productID.managedBy,
           receiver: order.buyer._id,
