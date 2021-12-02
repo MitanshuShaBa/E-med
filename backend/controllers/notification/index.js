@@ -64,6 +64,18 @@ exports.alert = (req, res) => {
     });
 };
 
+exports.deleteAlert = (req, res) => {
+  Alert.findOneAndDelete({ order: req.params.id })
+    .exec()
+    .then((err, _alert) => {
+      if (err || !_alert) {
+        return res.status(400).json({ error: err });
+      }
+
+      res.json({ msg: "Alert deleted" });
+    });
+};
+
 const sendAlert = (alert) => {
   console.log(alert._id);
   const mailOptions = {

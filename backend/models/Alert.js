@@ -10,6 +10,10 @@ const alertSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+    },
     triggerDate: {
       type: Date,
     },

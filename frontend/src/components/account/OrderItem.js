@@ -36,7 +36,9 @@ const OrderItem = ({ expanded, order }) => {
     server
       .patch("/order/" + order._id, { _id: order._id, status: "returned" })
       .then(({ data }) => {
-        // refund logic
+        server
+          .delete("/notification/alert/" + order._id)
+          .catch((err) => console.log(err));
       })
       .catch((err) => console.log(err));
   };

@@ -134,6 +134,7 @@ exports.updateOrder = async (req, res) => {
           const alert = new Alert({
             sender: item.productID.managedBy,
             receiver: order.buyer._id,
+            order: order._id,
           });
           alert.triggerQuantity = Math.floor(item.quantity * 0.1);
           if (alert.triggerQuantity <= 0) {
@@ -191,6 +192,7 @@ exports.updateOrder = async (req, res) => {
         const alert = new Alert({
           sender: item.productID.managedBy,
           receiver: order.buyer._id,
+          order: order._id,
         });
         const expiryDate = luxon.DateTime.fromJSDate(
           new Date(item.productID.expiry)
