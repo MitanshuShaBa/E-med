@@ -173,8 +173,8 @@ const NavBar = () => {
                 button
                 onClick={() => {
                   setOpen(false);
-                  sessionStorage.removeItem("token");
-                  sessionStorage.removeItem("user");
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("user");
                   dispatch({ type: "SET_TOKEN", token: null });
                   dispatch({ type: "SET_CART", cart: {} });
                   dispatch({ type: "SET_USER", user: initialState.user });

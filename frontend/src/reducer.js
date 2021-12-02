@@ -1,6 +1,6 @@
 export const initialState = {
-  token: sessionStorage.getItem("token") || null,
-  user: sessionStorage.getItem("user") || {
+  token: localStorage.getItem("token") || null,
+  user: localStorage.getItem("user") || {
     role: null,
     _id: null,
     managedBy: null,

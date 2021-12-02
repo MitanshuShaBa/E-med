@@ -28,8 +28,8 @@ const Base = ({ isLogin }) => {
         ...state,
       })
       .then(({ data: { token, user } }) => {
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
 
         dispatch({ type: "SET_TOKEN", token });
         dispatch({ type: "SET_USER", user });

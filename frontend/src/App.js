@@ -30,8 +30,8 @@ function App() {
 
   useEffect(() => {
     const authStateChange = setInterval(() => {
-      const sessionToken = sessionStorage.getItem("token");
-      const user = JSON.parse(sessionStorage.getItem("user"));
+      const sessionToken = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
       if (sessionToken !== null) {
         dispatch({ type: "SET_TOKEN", token: sessionToken });
         dispatch({ type: "SET_USER", user });
